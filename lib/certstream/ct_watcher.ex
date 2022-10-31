@@ -9,7 +9,11 @@ defmodule Certstream.CTWatcher do
   use GenServer
   use Instruments
 
-  @default_http_options [timeout: 10_000, recv_timeout: 10_000, ssl: [{:versions, [:'tlsv1.2']}], follow_redirect: true]
+  # Hide the symptoms of https://github.com/CaliDog/certstream-server/issues/80
+  # I'm sure the issue has something to do with the TLS libraries not finding the system CA bundle
+  # but I'm not sure how to properly fix that; adding verify_none is a temporary workaround
+  @default_http_options [timeout: 10_000, recv_timeout: 10_000, ssl: [{:versions, [:'tlsv1.2']}, verify: :verify_none], follow_redirect: true]
+
 
   def child_spec(log) do
     %{
